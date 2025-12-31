@@ -1,0 +1,49 @@
+# [IDE & OS]
+.idea/
+.vscode/
+*.swp
+*.iml
+.DS_Store
+Thumbs.db
+
+# [Language/Framework Specific]
+# Java / Spring
+**/build/
+**/out/
+**/.gradle/
+**/bin/
+
+# Node / Next.js
+**/node_modules/
+**/.next/
+**/out/
+**/build/
+**.tsbuildinfo
+.npm
+
+# Python / FastAPI
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+
+# [Environment & Secrets]
+# 민감한 정보(API Key, DB PW 등) 절대 금지
+**/.env
+**/.env.local
+**/.env.production
+**/application-secret.yml
+**/application-secret.properties
+
+# [Infrastructure]
+# DB 데이터는 Git에 올리지 않고 로컬/서버 볼륨에만 유지
+infra/db/data/
+
+# [AI Models]
+# 대용량 모델 파일은 Git LFS를 쓰거나 별도 서버에서 다운로드 권장
+**/models/*.pth
+**/models/*.h5
+**/models/*.onnx
+**/models/*.bin
