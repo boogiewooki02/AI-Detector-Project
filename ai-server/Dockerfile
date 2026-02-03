@@ -1,10 +1,16 @@
-# 3.10 대신 3.12 사용
 FROM python:3.12-slim
 
-WORKDIR /app
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libglib2.0-0 \
+    libxcb1 \
+    libx11-6 \
+    libxext6 \
+    libsm6 \
+    libice6 \
+    && rm -rf /var/lib/apt/lists/*
 
-# 시스템 의존성 업데이트 및 pip 업그레이드 (선택 사항이나 권장)
-RUN pip install --no-cache-dir --upgrade pip
+WORKDIR /app
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt

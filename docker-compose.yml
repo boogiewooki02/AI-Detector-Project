@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -15,6 +15,22 @@ services:
       - ./mysql_data:/var/lib/mysql
     networks:
       - ai-network
+
+  fastapi:
+    build: ./ai-server
+    container_name: ai-detection-fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-server:/app
+      - ./backend-spring/uploads:/app/uploads
+    environment:
+      - ENV=development
+      - TZ=Asia/Seoul
+    networks:
+      - ai-network
+    depends_on:
+      - db
 
 networks:
   ai-network:
