@@ -16,15 +16,16 @@ import java.io.IOException;
 public class DetectionController {
 
     private final DetectionService detectionService;
+    private final DetectionRepository detectionRepository;
 
     @PostMapping("/upload")
-    public ResponseEntity<Long> uploadImage(
+    public ResponseEntity<DetectionResponseDto> uploadImage(
             @RequestParam("file") MultipartFile file,
             @RequestParam("userId") Long userId
     ) throws IOException {
 
-        Long requestId = detectionService.requestDetection(file, userId);
+        DetectionResponseDto response = detectionService.requestDetection(file, userId);
 
-        return ResponseEntity.ok(requestId);
+        return ResponseEntity.ok(response);
     }
 }
