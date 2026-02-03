@@ -12,6 +12,7 @@ Thumbs.db
 **/out/
 **/.gradle/
 **/bin/
+**/uploads/
 
 # Node / Next.js
 **/node_modules/
