@@ -1,35 +1,21 @@
+version: '3.8'
+
 services:
-  # 1. Database
   db:
-    image: postgres:15-alpine
-    container_name: ai-db-postgres
-    restart: always
-    environment:
-      POSTGRES_USER: devuser
-      POSTGRES_PASSWORD: devpassword
-      POSTGRES_DB: aidetector
+    image: mysql:9.3
+    container_name: ai-detection-db
     ports:
-      - "5432:5432"
-    volumes:
-      - ./infra/db/data:/var/lib/postgresql/data
-
-  # 2. AI Server (Python)
-  ai-server:
-    build: ./ai-server
-    container_name: ai-server-fastapi
-    restart: always
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./ai-server:/app
+      - "3307:3306"
     environment:
-      - ENV=development
+      MYSQL_DATABASE: ai_detection_db
+      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user1234
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - ai-network
 
-  # 3. Backend (Spring) - 초기에는 로컬 실행을 위해 주석 처리하거나 설정
-  # backend:
-  #   build: ./backend-spring
-  #   container_name: spring-backend
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - db
+networks:
+  ai-network:
+    driver: bridge
