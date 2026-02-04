@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -89,5 +90,26 @@ public class DetectionService {
             System.err.println("FastAPI 통신 에러: " + e.getMessage());
             throw new RuntimeException("AI 서버 분석 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public DetectionResponseDto getDetectionDetail(Long requestId) {
+        DetectionRequest request = detectionRepository.findById(requestId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 분석 기록을 찾을 수 없습니다. ID: " + requestId));
+
+        return DetectionResponseDto.fromEntity(request);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DetectionResponseDto> getUserDetectionHistory(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+        }
+
+        return detectionRepository.findAllByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .map(DetectionResponseDto::fromEntity)
+                .toList();
     }
 }
