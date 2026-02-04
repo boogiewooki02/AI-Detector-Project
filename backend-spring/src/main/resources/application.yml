@@ -16,3 +16,6 @@ spring:
 
 file:
   upload-dir: ${user.dir}/uploads/
+
+jwt:
+  secret: your-very-long-and-secure-random-secret-key-more-than-32-chars
