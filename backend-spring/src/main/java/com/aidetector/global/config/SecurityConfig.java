@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안 함
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/login", "/api/v1/user/signup").permitAll() // 로그인/가입은 허용
+                        .requestMatchers("/api/v1/user/login", "/api/v1/user/signup").permitAll()
                         .requestMatchers("/uploads/**").permitAll() // 이미지는 누구나 볼 수 있게
                         .anyRequest().authenticated()               // 나머지는 토큰이 있어야 함
                 )

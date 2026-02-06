@@ -1,4 +1,4 @@
-package com.aidetector.domain.detection;
+package com.aidetector.domain.detection.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

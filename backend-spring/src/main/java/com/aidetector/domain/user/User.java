@@ -22,9 +22,6 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(unique = true, nullable = false)
-    private String username;
-
     @Column(nullable = false)
     private String password;
 
@@ -34,8 +31,8 @@ public class User {
     private LocalDateTime createdAt;
 
     @Builder
-    public User(String username, String password, String name) {
-        this.username = username;
+    public User(String email, String password, String name) {
+        this.email = email;
         this.password = password;
         this.name = name;
     }

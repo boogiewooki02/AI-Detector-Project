@@ -1,5 +1,6 @@
 package com.aidetector.domain.detection;
 
+import com.aidetector.domain.detection.dto.DetectionResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

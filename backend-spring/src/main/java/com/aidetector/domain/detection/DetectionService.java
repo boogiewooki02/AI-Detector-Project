@@ -1,5 +1,7 @@
 package com.aidetector.domain.detection;
 
+import com.aidetector.domain.detection.dto.DetectionResponseDto;
+import com.aidetector.domain.detection.dto.FastApiResponseDto;
 import com.aidetector.domain.user.User;
 import com.aidetector.domain.user.UserRepository;
 import com.aidetector.global.util.FileStore;

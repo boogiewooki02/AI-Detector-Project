@@ -1,5 +1,6 @@
-package com.aidetector.domain.detection;
+package com.aidetector.domain.detection.dto;
 
+import com.aidetector.domain.detection.DetectionRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
