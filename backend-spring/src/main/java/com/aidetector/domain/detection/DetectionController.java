@@ -30,12 +30,16 @@ public class DetectionController {
     }
 
     @GetMapping("/{requestId}")
-    public ResponseEntity<DetectionResponseDto> getDetectionDetail(@PathVariable Long requestId) {
+    public ResponseEntity<DetectionResponseDto> getDetectionDetail(
+            @PathVariable Long requestId
+    ) {
         return ResponseEntity.ok(detectionService.getDetectionDetail(requestId));
     }
 
-    @GetMapping("/history/{userId}")
-    public ResponseEntity<List<DetectionResponseDto>> getUserDetectionHistory(@PathVariable Long userId) {
-        return ResponseEntity.ok(detectionService.getUserDetectionHistory(userId));
+    @GetMapping("/history")
+    public ResponseEntity<List<DetectionResponseDto>> getUserDetectionHistory(
+            @AuthenticationPrincipal String email
+    ) {
+        return ResponseEntity.ok(detectionService.getUserDetectionHistory(email));
     }
 }

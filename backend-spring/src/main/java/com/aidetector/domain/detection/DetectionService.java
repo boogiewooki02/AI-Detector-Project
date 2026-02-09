@@ -103,14 +103,14 @@ public class DetectionService {
     }
 
     @Transactional(readOnly = true)
-    public List<DetectionResponseDto> getUserDetectionHistory(Long userId) {
+    public List<DetectionResponseDto> getUserDetectionHistory(String email) {
 
-        if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
-        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        return detectionRepository.findAllByUserIdOrderByCreatedAtDesc(userId)
-                .stream()
+        List<DetectionRequest> history = detectionRepository.findAllByUserOrderByCreatedAtDesc(user);
+
+        return history.stream()
                 .map(DetectionResponseDto::fromEntity)
                 .toList();
     }
