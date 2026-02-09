@@ -3,6 +3,7 @@ package com.aidetector.domain.detection;
 import com.aidetector.domain.detection.dto.DetectionResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,10 +21,10 @@ public class DetectionController {
     @PostMapping("/upload")
     public ResponseEntity<DetectionResponseDto> uploadImage(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("userId") Long userId
+            @AuthenticationPrincipal String email
     ) throws IOException {
 
-        DetectionResponseDto response = detectionService.requestDetection(file, userId);
+        DetectionResponseDto response = detectionService.requestDetection(file, email);
 
         return ResponseEntity.ok(response);
     }

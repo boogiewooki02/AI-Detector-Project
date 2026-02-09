@@ -31,9 +31,9 @@ public class DetectionService {
     private final WebClient fastapiClient;
     private final FileStore fileStore;
 
-    public DetectionResponseDto requestDetection(MultipartFile file, Long userId) throws IOException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. ID: " + userId));
+    public DetectionResponseDto requestDetection(MultipartFile file, String email) throws IOException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
         String storedFileName = fileStore.storeFile(file); // 원본 이미지 파일 저장
 
