@@ -46,10 +46,7 @@ export default function Home() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [topNotice, setTopNotice] = useState("");
 
-  const canSubmit = useMemo(
-    () => !analyzing,
-    [analyzing],
-  );
+  const canSubmit = useMemo(() => !analyzing, [analyzing]);
 
   const resetAnalyzeState = () => {
     setFile(null);
@@ -137,7 +134,9 @@ export default function Home() {
     if (!resultSectionRef.current) return;
 
     const top =
-      resultSectionRef.current.getBoundingClientRect().top + window.scrollY - 110;
+      resultSectionRef.current.getBoundingClientRect().top +
+      window.scrollY -
+      110;
     window.scrollTo({ top, behavior: "smooth" });
   }, [result]);
 
@@ -269,7 +268,9 @@ export default function Home() {
                             <p className="mt-3 text-sm font-semibold text-foreground">
                               분석 중입니다...
                             </p>
-                            <p className="mt-1 text-xs text-muted">잠시만 기다려주세요</p>
+                            <p className="mt-1 text-xs text-muted">
+                              잠시만 기다려주세요
+                            </p>
                           </div>
                         )}
                       </div>
@@ -377,9 +378,7 @@ export default function Home() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <article className="rounded-2xl border border-border bg-white p-5">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-foreground">
-                  SSIM ↓  LPIPS ↑
-                </h3>
+                <h3 className="font-bold text-foreground">SSIM ↓ LPIPS ↑</h3>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted">
                 구조가 붕괴되고 지각적 이질성이 극대화된 Failure 패턴입니다.
@@ -390,9 +389,7 @@ export default function Home() {
 
             <article className="rounded-2xl border border-border bg-white p-5">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-foreground">
-                  SSIM ↓  LPIPS ↓
-                </h3>
+                <h3 className="font-bold text-foreground">SSIM ↓ LPIPS ↓</h3>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted">
                 시각적으로는 자연스러우나 구조적 차이가 발생하는 Sleek Fake
@@ -420,11 +417,11 @@ export default function Home() {
             </article>
           </div>
 
-          <p className="mt-5 rounded-xl border border-[#dbe7d4] bg-[#f4f8f1] px-4 py-3 text-sm text-[#2f4331] shadow-xs">
+          {/* <p className="mt-5 rounded-xl border border-[#dbe7d4] bg-[#f4f8f1] px-4 py-3 text-sm text-[#2f4331] shadow-xs">
             RM/PVR 등 통계적 신호는 단독 판정의 근거가 될 수 없습니다. 반드시
             모델 확신도 및 시각적 히트맵과 연계하여 종합적인 포렌식 결론을
             도출하십시오.
-          </p>
+          </p> */}
         </section>
 
         <section
