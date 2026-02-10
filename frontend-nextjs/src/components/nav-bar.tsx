@@ -7,10 +7,11 @@ import {
   subscribeAuth,
 } from "@/lib/auth";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 export default function NavBar() {
+  const router = useRouter();
   const pathname = usePathname();
   const loggedIn = useSyncExternalStore(
     subscribeAuth,
@@ -67,6 +68,8 @@ export default function NavBar() {
 
   const handleLogout = () => {
     removeAccessToken();
+    router.push("/");
+    router.refresh();
   };
 
   return (
@@ -117,7 +120,7 @@ export default function NavBar() {
               </Link>
               <Link
                 href="/login"
-                className="rounded-md bg-primary px-3 py-1.5 font-semibold text-white hover:bg-primary-dark"
+                className="rounded-md border border-border bg-white px-3 py-1.5 font-semibold text-foreground shadow-sm transition hover:bg-slate-100"
               >
                 Log in
               </Link>
@@ -127,7 +130,7 @@ export default function NavBar() {
             <button
               type="button"
               onClick={handleLogout}
-              className="rounded-md border border-border px-3 py-1.5 hover:bg-white"
+              className="cursor-pointer rounded-md border border-border px-3 py-1.5 hover:bg-white"
             >
               Log out
             </button>
@@ -181,7 +184,10 @@ export default function NavBar() {
             <Link href="/signup" className="ml-auto whitespace-nowrap">
               Sign up
             </Link>
-            <Link href="/login" className="whitespace-nowrap font-semibold text-primary">
+            <Link
+              href="/login"
+              className="whitespace-nowrap rounded-md border border-border bg-white px-2.5 py-1 font-semibold text-foreground"
+            >
               Log in
             </Link>
           </>

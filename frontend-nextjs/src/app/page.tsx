@@ -4,7 +4,7 @@ import NavBar from "@/components/nav-bar";
 import { uploadDetectionImage } from "@/lib/api";
 import type { DetectionResponse } from "@/lib/types";
 import axios from "axios";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 function formatScore(value: number | null) {
   if (value === null || Number.isNaN(value)) return "-";
@@ -36,19 +36,40 @@ const faqItems = [
 
 export default function Home() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const resultSectionRef = useRef<HTMLDivElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<DetectionResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [topNotice, setTopNotice] = useState("");
 
   const canSubmit = useMemo(
-    () => Boolean(file) && !analyzing,
-    [file, analyzing],
+    () => !analyzing,
+    [analyzing],
   );
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file]);
 
   const handleAnalyze = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!file) return;
+    if (!file) {
+      setTopNotice("이미지를 먼저 첨부해주세요.");
+      return;
+    }
 
     setErrorMessage("");
     setAnalyzing(true);
@@ -72,23 +93,74 @@ export default function Home() {
     setFile(null);
     setResult(null);
     setErrorMessage("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
+
+  const handleRemoveSelectedImage = () => {
+    setFile(null);
+    setErrorMessage("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleFileSelect = (selectedFile: File | null) => {
+    setFile(selectedFile);
+    setErrorMessage("");
+  };
+
+  const handleDropFile = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    const droppedFile = event.dataTransfer.files?.[0] ?? null;
+    if (droppedFile) {
+      handleFileSelect(droppedFile);
+    }
+  };
+
+  useEffect(() => {
+    if (!topNotice) return;
+    const timer = setTimeout(() => setTopNotice(""), 2600);
+    return () => clearTimeout(timer);
+  }, [topNotice]);
+
+  useEffect(() => {
+    if (!result) return;
+    if (!resultSectionRef.current) return;
+
+    const top =
+      resultSectionRef.current.getBoundingClientRect().top + window.scrollY - 110;
+    window.scrollTo({ top, behavior: "smooth" });
+  }, [result]);
 
   return (
     <div className="min-h-screen">
       <NavBar />
 
       <main className="mx-auto w-full max-w-6xl px-5 pb-24 pt-10">
+        {topNotice && (
+          <div className="fixed left-1/2 top-20 z-[60] w-full max-w-md -translate-x-1/2 px-4">
+            <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm shadow-lg shadow-amber-100/60">
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                !
+              </span>
+              <p className="font-medium text-amber-900">{topNotice}</p>
+            </div>
+          </div>
+        )}
+
         <section id="analyze" className="scroll-mt-28">
           <article className="overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
-            <div className="bg-gradient-to-r from-primary to-cyan-700 px-10 py-10 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em]">
+            <div className="border-b border-border bg-slate-50 px-10 py-10">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
                 AI Visual Forensics
               </p>
-              <h1 className="mt-3 text-5xl font-black leading-tight">
+              <h1 className="mt-3 text-5xl font-black leading-tight text-foreground">
                 Image Analyzer
               </h1>
-              <p className="mt-4 max-w-3xl text-sm text-white/90">
+              <p className="mt-4 max-w-3xl text-sm text-muted">
                 이미지 첨부 후 분석 요청을 보내면, 같은 화면에서 바로 결과와
                 히트맵을 확인할 수 있습니다.
               </p>
@@ -97,53 +169,104 @@ export default function Home() {
             <div className="p-8">
               {!result && (
                 <form onSubmit={handleAnalyze} className="space-y-5">
-                  <div className="rounded-2xl border-2 border-dashed border-border bg-slate-50 p-10">
-                    <h2 className="text-xl font-bold">이미지 첨부</h2>
-                    <p className="mt-2 text-sm text-muted">
-                      PNG/JPG 파일 1개를 첨부하고 아래 버튼으로 이미지 분석을
-                      시작하세요.
-                    </p>
+                  <div className="rounded-2xl border border-border bg-white p-8">
                     <input
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
                       onChange={(event) =>
-                        setFile(event.target.files?.[0] ?? null)
+                        handleFileSelect(event.target.files?.[0] ?? null)
                       }
                       className="hidden"
                     />
-                    <div className="mt-6 flex items-center gap-3">
-                      <button
-                        type="button"
+                    <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+                      <div
+                        onDragOver={(event) => {
+                          event.preventDefault();
+                          setIsDragOver(true);
+                        }}
+                        onDragLeave={() => setIsDragOver(false)}
+                        onDrop={handleDropFile}
                         onClick={() => fileInputRef.current?.click()}
-                        className="cursor-pointer rounded-lg border border-border bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-100"
+                        className={`relative flex min-h-[320px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-slate-50 p-6 transition ${
+                          isDragOver
+                            ? "border-primary bg-cyan-50"
+                            : "border-border hover:border-primary/60"
+                        }`}
                       >
-                        이미지 선택
-                      </button>
-                      <span className="text-sm text-muted">
-                        {file ? file.name : "선택된 파일 없음"}
-                      </span>
-                    </div>
-                    <div className="mt-4 hidden">
-                      <input
-                        readOnly
-                        value={file?.name ?? ""}
-                        className="block w-full rounded-xl border border-border bg-white px-3 py-3 text-sm"
-                      />
-                    </div>
-                    <div className="mt-4 rounded-lg bg-white px-4 py-3 text-sm text-muted">
-                      {file
-                        ? `선택된 파일: ${file.name}`
-                        : "아직 선택된 파일이 없습니다."}
-                    </div>
-                    <div className="mt-5 flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={!canSubmit}
-                        className="cursor-pointer rounded-lg bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-cyan-500/30 transition hover:from-sky-600 hover:to-cyan-600 disabled:opacity-60"
-                      >
-                        {analyzing ? "Analyzing..." : "Start Analysis"}
-                      </button>
+                        {!previewUrl && (
+                          <div className="text-center">
+                            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                className="h-6 w-6 text-primary"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M12 16V4M12 4L7 9M12 4L17 9M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16"
+                                  stroke="currentColor"
+                                  strokeWidth="1.8"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </div>
+                            <p className="text-sm font-semibold text-foreground">
+                              클릭하여 업로드 또는 드래그 앤 드롭
+                            </p>
+                            <p className="mt-2 text-xs text-muted">
+                              PNG, JPG 파일 지원
+                            </p>
+                          </div>
+                        )}
+                        {previewUrl && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleRemoveSelectedImage();
+                              }}
+                              aria-label="선택 이미지 제거"
+                              className="cursor-pointer absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-white text-sm font-bold text-muted hover:bg-slate-100"
+                            >
+                              ×
+                            </button>
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={previewUrl}
+                              alt="Selected preview"
+                              className="h-full max-h-[280px] w-full rounded-lg border border-border bg-white object-contain"
+                            />
+                          </>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col justify-between rounded-xl border border-border bg-slate-50 p-6">
+                        <div>
+                          <h2 className="text-xl font-bold">이미지 첨부</h2>
+                          <p className="mt-2 text-sm text-muted">
+                            좌측 영역에 이미지를 업로드하면 프리뷰가 표시됩니다.
+                            <br></br>
+                            준비되면 아래 버튼으로 분석을 시작하세요.
+                          </p>
+                          <p className="mt-4 rounded-lg bg-white px-4 py-3 text-sm text-muted">
+                            {file
+                              ? `선택된 파일: ${file.name}`
+                              : "아직 선택된 파일이 없습니다."}
+                          </p>
+                        </div>
+                        <div className="mt-6">
+                          <button
+                            type="submit"
+                            disabled={!canSubmit}
+                            className="w-full cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark disabled:opacity-60"
+                          >
+                            {analyzing ? "Analyzing..." : "Start Analysis"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   {analyzing && (
@@ -159,7 +282,7 @@ export default function Home() {
               )}
 
               {result && (
-                <div className="space-y-5">
+                <div ref={resultSectionRef} className="space-y-5">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-black">Analysis Result</h2>
                     <button
@@ -229,11 +352,11 @@ export default function Home() {
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <article className="rounded-2xl border border-border bg-white p-5">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-red-600">
+                <h3 className="font-bold text-foreground">
                   SSIM ↓ + LPIPS ↑ (Zone D)
                 </h3>
               </div>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 구조가 붕괴되고 지각적 이질성이 극대화된 Failure 패턴입니다.
                 이미지 전반의 물리적 지표가 최악인 상태로, 명백한 위변조
                 가능성을 시사합니다.
@@ -242,11 +365,11 @@ export default function Home() {
 
             <article className="rounded-2xl border border-border bg-white p-5">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-orange-500">
+                <h3 className="font-bold text-foreground">
                   SSIM ↓ + LPIPS ↓ (Zone B)
                 </h3>
               </div>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 시각적으로는 자연스러우나 구조적 차이가 발생하는 Sleek Fake
                 패턴입니다. 정교한 생성형 AI 기술이 적용된 케이스이므로 히트맵의
                 경계면을 정밀 검계하세요.
@@ -255,7 +378,7 @@ export default function Home() {
 
             <article className="rounded-2xl border border-border bg-white p-5">
               <h3 className="font-bold">RM & PVR 잔차 분석</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 RM 수치는 고주파 잔차의 전반적 강도를, PVR은 특정 구간의 강한
                 노이즈 피크 분포를 의미합니다. 수치가 급증했다면 육안으로
                 식별하기 어려운 미세 합성 흔적을 의심해야 합니다.
@@ -264,7 +387,7 @@ export default function Home() {
 
             <article className="rounded-2xl border border-border bg-white p-5">
               <h3 className="font-bold">Heatmap (집중 탐지 영역)</h3>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 붉은 영역은 모델이 픽셀 불연속성이나 인위적 아티팩트를 포착한
                 핵심 근거지입니다. 해당 위치의 질감 왜곡이나 반복적인 패턴 발생
                 여부를 중점적으로 판독하세요.
@@ -272,7 +395,7 @@ export default function Home() {
             </article>
           </div>
 
-          <p className="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900 shadow-sm">
+          <p className="mt-5 rounded-xl border border-border bg-slate-50 px-4 py-3 text-sm text-muted shadow-xs">
             RM/PVR 등 통계적 신호는 단독 판정의 근거가 될 수 없습니다. 반드시
             모델 확신도 및 시각적 히트맵과 연계하여 종합적인 포렌식 결론을
             도출하십시오.
