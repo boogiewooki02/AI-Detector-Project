@@ -13,19 +13,24 @@ function formatScore(value: number | null) {
 
 const faqItems = [
   {
-    question: "판별 결과가 100% 정확한가요?",
+    question: "AI 판정 등급(Zone A~D)은 어떤 기준으로 분류되나요?",
     answer:
-      "아니요. 모델은 확률 기반 참고 지표입니다. 고위험 콘텐츠는 출처 검증과 메타데이터 확인을 병행하세요.",
+      "본 서비스는 이미지의 구조적 유사도(SSIM)와 지각적 품질(LPIPS)을 복합 분석하여 4단계로 분류합니다. 원본 상태인 Zone A부터, 육안 식별이 어려운 고도로 정밀한 합성형인 Zone B, 물리적 왜곡이 뚜렷한 Zone C/D로 구분하여 리스크를 정의합니다.",
   },
   {
-    question: "업로드한 이미지는 어디에 저장되나요?",
+    question: "분석 리포트에 표시된 SSIM과 LPIPS는 무엇을 의미하나요?",
     answer:
-      "업로드 이미지와 히트맵은 스토리지(S3)에 저장되며, 결과 응답에 URL이 포함됩니다.",
+      "SSIM은 이미지의 형태적 틀이 얼마나 유지되었는지를 나타내며, LPIPS는 인간이 느끼는 시각적 자연스러움을 측정합니다. 두 수치가 상충할 경우(예: 시각적으로는 자연스러우나 구조가 변형된 경우) 생성형 AI에 의한 정밀 조작 가능성이 높다고 판단합니다.",
   },
   {
-    question: "로그인 없이도 분석할 수 있나요?",
+    question: "히트맵(Heatmap)의 붉은 영역은 무엇을 나타내나요?",
     answer:
-      "현재 서버 설정에 따라 401이 날 수 있습니다. 이 경우 로그인 후 재시도하면 됩니다.",
+      "AI 모델이 위변조의 결정적 증거라고 판단한 집중 분석 구역입니다. 주로 사물의 경계면이나 부자연스러운 노이즈가 발생하는 지점에 나타나며, 분석가는 이 영역을 통해 변조 의심 지점을 시각적으로 즉시 확인할 수 있습니다.",
+  },
+  {
+    question: "이미지를 업로드했는데 분석이 진행되지 않습니다.",
+    answer:
+      "인증 세션이 만료되었거나 서버와의 연결이 불안정할 때 발생할 수 있습니다. 오류가 발생한다면 재로그인을 진행해 주시고, 문제가 지속될 경우 이미지 파일 형식이 JPG 또는 PNG인지 확인해 주세요.",
   },
 ];
 
@@ -223,39 +228,54 @@ export default function Home() {
           <h2 className="mt-3 text-2xl font-black">분석 결과 해석 가이드</h2>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <article className="rounded-2xl border border-border bg-white p-5">
-              <h3 className="font-semibold">SSIM ↓ + LPIPS ↑</h3>
-              <p className="mt-2 text-sm text-muted">
-                구조 유사도는 낮고 지각 차이는 큰 패턴입니다. 픽셀 단위 미세
-                변조 또는 강한 합성 흔적 가능성을 우선 점검하세요.
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-red-600">
+                  SSIM ↓ + LPIPS ↑ (Zone D)
+                </h3>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                구조가 붕괴되고 지각적 이질성이 극대화된 Failure 패턴입니다.
+                이미지 전반의 물리적 지표가 최악인 상태로, 명백한 위변조
+                가능성을 시사합니다.
               </p>
             </article>
+
             <article className="rounded-2xl border border-border bg-white p-5">
-              <h3 className="font-semibold">SSIM ↑ + Confidence 낮음</h3>
-              <p className="mt-2 text-sm text-muted">
-                표면 구조는 유사하지만 모델 확신이 낮은 경우입니다. 정밀 합성
-                기술이 적용된 케이스일 수 있어 추가 검증이 필요합니다.
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-orange-500">
+                  SSIM ↓ + LPIPS ↓ (Zone B)
+                </h3>
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                시각적으로는 자연스러우나 구조적 차이가 발생하는 Sleek Fake
+                패턴입니다. 정교한 생성형 AI 기술이 적용된 케이스이므로 히트맵의
+                경계면을 정밀 검계하세요.
               </p>
             </article>
+
             <article className="rounded-2xl border border-border bg-white p-5">
-              <h3 className="font-semibold">RM / PVR 해석</h3>
-              <p className="mt-2 text-sm text-muted">
-                RM이 높을수록 고주파 잔차 강도가 전반적으로 크고, PVR이 높을수록
-                강한 피크가 넓게 분포한 패턴(노이즈/깨짐/합성 흔적) 가능성이
-                큽니다.
+              <h3 className="font-bold">RM & PVR 잔차 분석</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                RM 수치는 고주파 잔차의 전반적 강도를, PVR은 특정 구간의 강한
+                노이즈 피크 분포를 의미합니다. 수치가 급증했다면 육안으로
+                식별하기 어려운 미세 합성 흔적을 의심해야 합니다.
               </p>
             </article>
+
             <article className="rounded-2xl border border-border bg-white p-5">
-              <h3 className="font-semibold">Heatmap (붉은 영역)</h3>
-              <p className="mt-2 text-sm text-muted">
-                붉은색 영역은 모델이 위변조 징후를 집중 탐지한 구간입니다.
-                원본과 비교해 해당 위치의 경계, 질감, 반복 패턴을 함께
-                확인하세요.
+              <h3 className="font-bold">Heatmap (집중 탐지 영역)</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                붉은 영역은 모델이 픽셀 불연속성이나 인위적 아티팩트를 포착한
+                핵심 근거지입니다. 해당 위치의 질감 왜곡이나 반복적인 패턴 발생
+                여부를 중점적으로 판독하세요.
               </p>
             </article>
           </div>
-          <p className="mt-5 rounded-xl border border-border bg-cyan-50 px-4 py-3 text-sm text-cyan-900">
-            RM/PVR은 통계적 신호입니다. 단독 확정 판정 대신
-            SSIM/LPIPS/Confidence/Heatmap과 종합 판단하세요.
+
+          <p className="mt-5 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900 shadow-sm">
+            RM/PVR 등 통계적 신호는 단독 판정의 근거가 될 수 없습니다. 반드시
+            모델 확신도 및 시각적 히트맵과 연계하여 종합적인 포렌식 결론을
+            도출하십시오.
           </p>
         </section>
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import axios from "axios";
 import NavBar from "@/components/nav-bar";
 import { signup } from "@/lib/api";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -24,7 +24,9 @@ export default function SignupPage() {
       router.push("/login");
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        setErrorMessage(error.response?.data?.message ?? "회원가입에 실패했습니다.");
+        setErrorMessage(
+          error.response?.data?.message ?? "회원가입에 실패했습니다.",
+        );
       } else {
         setErrorMessage("회원가입 중 오류가 발생했습니다.");
       }
@@ -79,11 +81,13 @@ export default function SignupPage() {
                 className="w-full rounded-lg border border-border px-3 py-2 outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
-            {errorMessage && <p className="text-sm text-danger">{errorMessage}</p>}
+            {errorMessage && (
+              <p className="text-sm text-danger">{errorMessage}</p>
+            )}
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
+              className="cursor-pointer w-full rounded-lg bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-dark disabled:opacity-60"
             >
               {loading ? "회원가입 중..." : "회원가입"}
             </button>
