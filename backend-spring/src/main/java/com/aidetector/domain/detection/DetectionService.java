@@ -4,22 +4,17 @@ import com.aidetector.domain.detection.dto.DetectionResponseDto;
 import com.aidetector.domain.detection.dto.FastApiResponseDto;
 import com.aidetector.domain.user.User;
 import com.aidetector.domain.user.UserRepository;
-import com.aidetector.global.util.FileStore;
 import com.aidetector.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +22,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class DetectionService {
 
     private final DetectionRepository detectionRepository;
@@ -111,5 +107,28 @@ public class DetectionService {
         return history.stream()
                 .map(DetectionResponseDto::fromEntity)
                 .toList();
+    }
+
+    public void deleteDetectionHistory(Long id, String email) {
+        log.info("[이력 삭제 시도] User: {}, HistoryId: {}", email, id);
+
+        DetectionRequest request = detectionRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("[이력 삭제 실패] 존재하지 않는 ID: {}", id);
+                    return new IllegalArgumentException("존재하지 않는 이력입니다.");
+                });
+
+        if (!request.getUser().getEmail().equals(email)) {
+            throw new AccessDeniedException("본인의 이력만 삭제할 수 있습니다.");
+        }
+
+        String originalUrl = request.getStoredFilePath();
+        String heatmapUrl = request.getHeatmapUrl();
+
+        s3Service.delete(originalUrl);
+        s3Service.delete(heatmapUrl);
+
+        detectionRepository.delete(request);
+        log.info("[이력 삭제 완료] User: {}, HistoryId: {}", email, id);
     }
 }

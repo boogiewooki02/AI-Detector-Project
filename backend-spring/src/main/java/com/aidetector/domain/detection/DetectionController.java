@@ -42,4 +42,13 @@ public class DetectionController {
     ) {
         return ResponseEntity.ok(detectionService.getUserDetectionHistory(email));
     }
+
+    @DeleteMapping("/history/{id}")
+    public ResponseEntity<Void> deleteDetectionHistory(
+            @PathVariable Long id,
+            @AuthenticationPrincipal String email
+    ) {
+        detectionService.deleteDetectionHistory(id, email);
+        return ResponseEntity.noContent().build();
+    }
 }

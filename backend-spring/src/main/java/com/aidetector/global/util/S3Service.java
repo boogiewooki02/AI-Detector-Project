@@ -4,15 +4,19 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class S3Service {
 
     private final AmazonS3 amazonS3;
@@ -34,5 +38,22 @@ public class S3Service {
 
         // 업로드된 파일의 public url 반환
         return amazonS3.getUrl(bucket, fileName).toString();
+    }
+
+    public void delete(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) return;
+
+        try {
+            // URL에서 파일명(Key) 추출
+            // 예: https://bucket.s3.region.amazonaws.com/filename.png -> filename.png
+            String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+            String decodeKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+
+            amazonS3.deleteObject(bucket, decodeKey);
+            log.info("S3 파일 삭제 성공: {}", decodeKey);
+        } catch (Exception e) {
+            log.error("S3 파일 삭제 실패: {}", e.getMessage());
+        }
     }
 }
