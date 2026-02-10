@@ -2,6 +2,7 @@
 
 import NavBar from "@/components/nav-bar";
 import { uploadDetectionImage } from "@/lib/api";
+import { getAccessToken, subscribeAuth } from "@/lib/auth";
 import type { DetectionResponse } from "@/lib/types";
 import axios from "axios";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -50,6 +51,16 @@ export default function Home() {
     [analyzing],
   );
 
+  const resetAnalyzeState = () => {
+    setFile(null);
+    setResult(null);
+    setErrorMessage("");
+    setTopNotice("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   useEffect(() => {
     if (!file) {
       setPreviewUrl(null);
@@ -80,7 +91,7 @@ export default function Home() {
       setResult(uploadResponse);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        setErrorMessage("현재 서버 설정상 로그인 후 분석 요청이 가능합니다.");
+        setErrorMessage("인증 오류가 발생했습니다. 다시 시도해주세요.");
       } else {
         setErrorMessage("분석 요청에 실패했습니다.");
       }
@@ -90,12 +101,7 @@ export default function Home() {
   };
 
   const handleReset = () => {
-    setFile(null);
-    setResult(null);
-    setErrorMessage("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    resetAnalyzeState();
   };
 
   const handleRemoveSelectedImage = () => {
@@ -134,6 +140,14 @@ export default function Home() {
       resultSectionRef.current.getBoundingClientRect().top + window.scrollY - 110;
     window.scrollTo({ top, behavior: "smooth" });
   }, [result]);
+
+  useEffect(() => {
+    return subscribeAuth(() => {
+      if (!getAccessToken()) {
+        resetAnalyzeState();
+      }
+    });
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -182,17 +196,24 @@ export default function Home() {
                     <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
                       <div
                         onDragOver={(event) => {
+                          if (analyzing) return;
                           event.preventDefault();
                           setIsDragOver(true);
                         }}
                         onDragLeave={() => setIsDragOver(false)}
-                        onDrop={handleDropFile}
-                        onClick={() => fileInputRef.current?.click()}
-                        className={`relative flex min-h-[320px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-slate-50 p-6 transition ${
+                        onDrop={(event) => {
+                          if (analyzing) return;
+                          handleDropFile(event);
+                        }}
+                        onClick={() => {
+                          if (analyzing) return;
+                          fileInputRef.current?.click();
+                        }}
+                        className={`relative flex min-h-[320px] items-center justify-center rounded-xl border-2 border-dashed bg-slate-50 p-6 transition ${
                           isDragOver
                             ? "border-primary bg-cyan-50"
                             : "border-border hover:border-primary/60"
-                        }`}
+                        } ${analyzing ? "cursor-default" : "cursor-pointer"}`}
                       >
                         {!previewUrl && (
                           <div className="text-center">
@@ -229,7 +250,8 @@ export default function Home() {
                                 handleRemoveSelectedImage();
                               }}
                               aria-label="선택 이미지 제거"
-                              className="cursor-pointer absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-white text-sm font-bold text-muted hover:bg-slate-100"
+                              disabled={analyzing}
+                              className="cursor-pointer absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full border border-border bg-white text-sm font-bold text-muted hover:bg-slate-100 disabled:opacity-40"
                             >
                               ×
                             </button>
@@ -240,6 +262,15 @@ export default function Home() {
                               className="h-full max-h-[280px] w-full rounded-lg border border-border bg-white object-contain"
                             />
                           </>
+                        )}
+                        {analyzing && (
+                          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-xl bg-white/75 backdrop-blur-[1px]">
+                            <div className="h-10 w-10 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                            <p className="mt-3 text-sm font-semibold text-foreground">
+                              분석 중입니다...
+                            </p>
+                            <p className="mt-1 text-xs text-muted">잠시만 기다려주세요</p>
+                          </div>
                         )}
                       </div>
 
@@ -261,7 +292,7 @@ export default function Home() {
                           <button
                             type="submit"
                             disabled={!canSubmit}
-                            className="w-full cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-dark disabled:opacity-60"
+                            className="w-full cursor-pointer rounded-lg bg-[#3f8fa3] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#66adbe] disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {analyzing ? "Analyzing..." : "Start Analysis"}
                           </button>
@@ -269,12 +300,6 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                  {analyzing && (
-                    <div className="flex items-center gap-3 rounded-xl bg-cyan-50 px-4 py-3 text-sm">
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                      Analyzing image, please wait...
-                    </div>
-                  )}
                   {errorMessage && (
                     <p className="text-sm text-danger">{errorMessage}</p>
                   )}
@@ -353,7 +378,7 @@ export default function Home() {
             <article className="rounded-2xl border border-border bg-white p-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">
-                  SSIM ↓ + LPIPS ↑ (Zone D)
+                  SSIM ↓  LPIPS ↑
                 </h3>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -366,7 +391,7 @@ export default function Home() {
             <article className="rounded-2xl border border-border bg-white p-5">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-foreground">
-                  SSIM ↓ + LPIPS ↓ (Zone B)
+                  SSIM ↓  LPIPS ↓
                 </h3>
               </div>
               <p className="mt-2 text-sm leading-relaxed text-muted">
@@ -395,7 +420,7 @@ export default function Home() {
             </article>
           </div>
 
-          <p className="mt-5 rounded-xl border border-border bg-slate-50 px-4 py-3 text-sm text-muted shadow-xs">
+          <p className="mt-5 rounded-xl border border-[#dbe7d4] bg-[#f4f8f1] px-4 py-3 text-sm text-[#2f4331] shadow-xs">
             RM/PVR 등 통계적 신호는 단독 판정의 근거가 될 수 없습니다. 반드시
             모델 확신도 및 시각적 히트맵과 연계하여 종합적인 포렌식 결론을
             도출하십시오.

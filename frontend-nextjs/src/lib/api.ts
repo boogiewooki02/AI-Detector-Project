@@ -55,3 +55,7 @@ export async function getDetectionDetail(requestId: number) {
   const response = await api.get<DetectionResponse>(`/api/v1/detection/${requestId}`);
   return response.data;
 }
+
+export async function deleteDetectionHistory(requestId: number) {
+  await api.delete(`/api/v1/detection/history/${requestId}`);
+}
