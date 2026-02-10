@@ -5,6 +5,7 @@ import com.aidetector.domain.detection.dto.FastApiResponseDto;
 import com.aidetector.domain.user.User;
 import com.aidetector.domain.user.UserRepository;
 import com.aidetector.global.util.FileStore;
+import com.aidetector.global.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -19,7 +20,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,47 +32,39 @@ public class DetectionService {
     private final DetectionRepository detectionRepository;
     private final UserRepository userRepository;
     private final WebClient fastapiClient;
-    private final FileStore fileStore;
+    private final S3Service s3Service;
+//    private final FileStore fileStore;
 
     public DetectionResponseDto requestDetection(MultipartFile file, String email) throws IOException {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        String storedFileName = fileStore.storeFile(file); // 원본 이미지 파일 저장
+        // 원본 이미지 저장
+        String s3Url = s3Service.upload(file);
 
         DetectionRequest detectionRequest = DetectionRequest.builder()
                 .user(user)
                 .originalFileName(file.getOriginalFilename())
-                .storedFilePath(storedFileName)
+                .storedFilePath(s3Url)
                 .build();
 
         detectionRepository.save(detectionRequest);
 
-        analyzeImage(storedFileName, detectionRequest);
+        analyzeImage(s3Url, detectionRequest);
 
         return DetectionResponseDto.fromEntity(detectionRequest);
     }
 
-    private void analyzeImage(String storedFileName, DetectionRequest request) {
+    private void analyzeImage(String s3Url, DetectionRequest request) {
         try {
-            Path path = Paths.get("uploads", storedFileName);
-            byte[] fileBytes = Files.readAllBytes(path);
-
-            ByteArrayResource resource = new ByteArrayResource(fileBytes) {
-                @Override
-                public String getFilename() {
-                    return storedFileName;
-                }
-            };
-
-            MultipartBodyBuilder builder = new MultipartBodyBuilder();
-            builder.part("file", resource, MediaType.IMAGE_JPEG);
+            Map<String, String> requestBody = new HashMap<>();
+            requestBody.put("image_url", s3Url);
 
             // FastAPI 호출
             FastApiResponseDto response = fastapiClient.post()
                     .uri("/predict")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .body(BodyInserters.fromMultipartData(builder.build()))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(FastApiResponseDto.class)
                     .block();

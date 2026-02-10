@@ -2,8 +2,10 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from inference import SwinInference
 import io
-from PIL import Image
 import os
+from PIL import Image
+import requests
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -13,6 +15,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class ImageUrlRequest(BaseModel):
+    image_url: str
 
 # 설정 (Docker 볼륨 경로와 일치해야 함)
 UPLOAD_DIR = "/app/uploads"
@@ -32,19 +37,26 @@ RISK_TABLE = {
     3: {"name": "Failure (망가짐)", "state": "High Risk"},
 }
 
+
 @app.get("/")
 def health_check():
     return {"status": "AI Server is Running"}
 
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
+async def predict(request: ImageUrlRequest):
     try:
-        # 1. 이미지 읽기
-        image_data = await file.read()
-        image = Image.open(io.BytesIO(image_data)).convert("RGB")
+        # S3 URL로 이미지 다운로드
+        image_url = request.image_url
+        response = requests.get(image_url)
+
+        if response.status_code != 200:
+            raise HTTPException(status_code=400, detail="이미지를 불러올 수 없습니다.")
         
-        # 2. 모델 추론
-        results = engine.predict(image, file.filename)
+        image = Image.open(io.BytesIO(response.content)).convert("RGB")
+
+        filename = image_url.split("/")[-1]
+
+        results = engine.predict(image, filename)
         
         # 3. 결과 구성
         info = RISK_TABLE[results["label"]]
