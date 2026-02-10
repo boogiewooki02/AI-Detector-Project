@@ -19,3 +19,15 @@ file:
 
 jwt:
   secret: your-very-long-and-secure-random-secret-key-more-than-32-chars
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+    s3:
+      bucket: ai-detector-bucket-dongwook
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
