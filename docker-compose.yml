@@ -27,6 +27,10 @@ services:
     environment:
       - ENV=development
       - TZ=Asia/Seoul
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
+      - AWS_REGION=ap-northeast-2
+      - S3_BUCKET_NAME=ai-detector-bucket-dongwook
     networks:
       - ai-network
     depends_on:

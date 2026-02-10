@@ -10,3 +10,4 @@ opencv-python-headless
 ttach
 grad-cam
 requests
+boto3

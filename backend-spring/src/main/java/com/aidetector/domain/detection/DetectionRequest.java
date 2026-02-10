@@ -42,7 +42,7 @@ public class DetectionRequest {
     private Double lpips;              // 지각 유사도
     private Double rm;                 // 잔차 평균
     private Double pvr;                // 강한 피크 비율
-    private String heatmapFilename;    // 저장된 히트맵 파일명 (hm_...)
+    private String heatmapUrl;    // 저장된 히트맵 파일명 (hm_...)
 
     @Builder
     public DetectionRequest(User user, String originalFileName, String storedFilePath) {
@@ -57,7 +57,7 @@ public class DetectionRequest {
      */
     public void completeAnalysis(Integer label, String labelName, String state,
                                  Double confidence, Double ssim, Double lpips,
-                                 Double rm, Double pvr, String heatmapFilename) {
+                                 Double rm, Double pvr, String heatmapUrl) {
         this.label = label;
         this.labelName = labelName;
         this.state = state;
@@ -66,7 +66,7 @@ public class DetectionRequest {
         this.lpips = lpips;
         this.rm = rm;
         this.pvr = pvr;
-        this.heatmapFilename = heatmapFilename;
+        this.heatmapUrl = heatmapUrl;
         this.status = DetectionStatus.COMPLETED; // 분석 완료 상태로 변경
     }
 

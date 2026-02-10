@@ -6,6 +6,8 @@ import os
 from PIL import Image
 import requests
 from pydantic import BaseModel
+import boto3
+from uuid import uuid4
 
 app = FastAPI()
 
@@ -37,6 +39,14 @@ RISK_TABLE = {
     3: {"name": "Failure (망가짐)", "state": "High Risk"},
 }
 
+s3_client = boto3.client(
+    's3',
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
+    region_name=os.getenv('AWS_REGION')
+)
+BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+
 
 @app.get("/")
 def health_check():
@@ -57,6 +67,18 @@ async def predict(request: ImageUrlRequest):
         filename = image_url.split("/")[-1]
 
         results = engine.predict(image, filename)
+
+        local_heatmap_path = os.path.join(UPLOAD_DIR, results["heatmap_filename"])
+        s3_heatmap_name = f"heatmap_{uuid4()}.png"
+
+        s3_client.upload_file(
+            local_heatmap_path,
+            BUCKET_NAME,
+            s3_heatmap_name,
+            ExtraArgs={'ContentType': 'image/png'}
+        )
+
+        heatmap_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{s3_heatmap_name}"
         
         # 3. 결과 구성
         info = RISK_TABLE[results["label"]]
@@ -65,11 +87,11 @@ async def predict(request: ImageUrlRequest):
             "labelName": info["name"],
             "state": info["state"],
             "confidence": round(results["confidence"], 4),
+            "heatmapUrl": heatmap_url,
             "ssim": round(results["ssim"], 4),
             "lpips": round(results["lpips"], 4),
             "rm": round(results["rm"], 6),
             "pvr": round(results["pvr"], 2),
-            "heatmapFilename": results["heatmap_filename"]
         }
     except Exception as e:
         print(f"Error: {e}")

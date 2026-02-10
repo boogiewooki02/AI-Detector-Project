@@ -30,8 +30,8 @@ public class DetectionResponseDto {
                 .lpips(entity.getLpips())
                 .rm(entity.getRm())
                 .pvr(entity.getPvr())
-                .originalImageUrl("/uploads/" + entity.getStoredFilePath())
-                .heatmapImageUrl("/uploads/" + entity.getHeatmapFilename())
+                .originalImageUrl(entity.getStoredFilePath())
+                .heatmapImageUrl(entity.getHeatmapUrl())
                 .build();
     }
 }

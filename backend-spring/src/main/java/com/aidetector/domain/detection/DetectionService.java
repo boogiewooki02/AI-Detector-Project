@@ -79,7 +79,7 @@ public class DetectionService {
                         response.getLpips(),
                         response.getRm(),
                         response.getPvr(),
-                        response.getHeatmapFilename()
+                        response.getHeatmapUrl()
                 );
             }
         } catch (Exception e) {

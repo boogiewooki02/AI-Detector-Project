@@ -14,5 +14,5 @@ public class FastApiResponseDto {
     private Double lpips;
     private Double rm;
     private Double pvr;
-    private String heatmapFilename;
+    private String heatmapUrl;
 }
