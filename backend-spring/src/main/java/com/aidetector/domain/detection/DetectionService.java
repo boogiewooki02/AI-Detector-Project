@@ -36,14 +36,17 @@ public class DetectionService {
 //    private final FileStore fileStore;
 
     public DetectionResponseDto requestDetection(MultipartFile file, String email) throws IOException {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        User user = null;
+
+        if (email != null) {
+            user = userRepository.findByEmail(email).orElse(null);
+        }
 
         // 원본 이미지 저장
         String s3Url = s3Service.upload(file);
 
         DetectionRequest detectionRequest = DetectionRequest.builder()
-                .user(user)
+                .user(user) // 비회원이면 null
                 .originalFileName(file.getOriginalFilename())
                 .storedFilePath(s3Url)
                 .build();
