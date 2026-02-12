@@ -1,26 +1,15 @@
 # Is It AI (AI Image Forgery Detection)
 
-**Is It AI**는 업로드된 이미지의 위·변조 여부를 정밀 분석하고, 히트맵(Heatmap) 시각화 결과와 함께 신뢰 지표(Confidence 및 다양한 정량 지표)를 제공하는 서비스입니다.
+**Is It AI**는 업로드된 이미지의 위·변조 여부를 분석하고, 히트맵(Heatmap) 시각화 결과와 함께 신뢰 지표(Confidence 및 다양한 정량 지표)를 제공하는 서비스입니다.
 
 ---
 
-## Service Architecture
+## Key Features
 
-- **Frontend**: Vercel 기반 정적 호스팅 및 자동 배포
-- **Backend API**: AWS EC2에서 Docker 컨테이너로 운영
-- **Reverse Proxy**: Nginx를 통한 HTTPS(SSL) 및 포트 포워딩 처리
-- **Storage**: AWS S3를 중앙 저장소로 활용하여 서버 간 이미지 데이터 정합성 유지
-
----
-
-## Tech Stack
-
-| 영역   | 사용 기술                                           |
-| ---------- | ---------------------------------------------------- |
-| Frontend   | Next.js 16, React 19, TypeScript, Tailwind CSS 4     |
-| Backend    | Java 21, Spring Boot 3.4, Spring Security (JWT), JPA |
-| AI Server  | Python 3.12, FastAPI, PyTorch, Grad-CAM              |
-| Infra / DB | MySQL, Docker Compose, AWS EC2, AWS S3, GitHub Actions        |
+- **Anonymous Analysis**: 비로그인 사용자도 즉시 이미지 위변조 판별 가능
+- **User History**: JWT 기반 인증으로 사용자별 히스토리 관리 및 상세 조회/삭제
+- **Analysis Metrics**: 단순 판별을 넘어 **Confidence, SSIM, LPIPS, RM, PVR** 등 지표 제공
+- **Visual Feedback**: 원본 대비 **히트맵 이미지 제공**으로 위변조 의심 영역 시각화
 
 ---
 
@@ -42,12 +31,49 @@
 
 ---
 
-## Key Features
+## Service Architecture
 
-- **Anonymous Analysis**: 비로그인 사용자도 즉시 이미지 위변조 판별 가능
-- **User History**: JWT 기반 인증으로 사용자별 히스토리 관리 및 상세 조회/삭제
-- **Analysis Metrics**: 단순 판별을 넘어 **Confidence, SSIM, LPIPS, RM, PVR** 등 지표 제공
-- **Visual Feedback**: 원본 대비 **히트맵 이미지 제공**으로 위변조 의심 영역 시각화
+- **Frontend**: Vercel 기반 정적 호스팅 및 자동 배포
+- **Backend API**: AWS EC2에서 Docker 컨테이너로 운영
+- **Reverse Proxy**: Nginx를 통한 HTTPS(SSL) 및 포트 포워딩 처리
+- **Storage**: AWS S3를 중앙 스토리지로 활용하여 서버 간 이미지 데이터 정합성 유지
+
+---
+
+## Deployment & CI/CD
+
+- Frontend: Vercel Git Hook 기반 자동 배포
+
+- Backend: GitHub Actions로 Docker Image 빌드 후 EC2 자동 배포
+
+- Security: Certbot(Let's Encrypt) 기반 HTTPS 통신
+
+---
+
+## Service Screenshots
+
+1. 분석 중 화면
+
+![Analyzing Screen](docs/images/analyzing.png)
+
+2. 분석 결과 화면
+
+![Analysis Result Screen](docs/images/result.png)
+
+3. 분석 이력 화면
+
+![Guideline Screen](docs/images/history.png)
+
+---
+
+## Tech Stack
+
+| 영역       | 사용 기술                                              |
+| ---------- | ------------------------------------------------------ |
+| Frontend   | Next.js 16, React 19, TypeScript, Tailwind CSS 4       |
+| Backend    | Java 21, Spring Boot 3.4, Spring Security (JWT), JPA   |
+| AI Server  | Python 3.12, FastAPI, PyTorch, Grad-CAM                |
+| Infra / DB | MySQL, Docker Compose, AWS EC2, AWS S3, GitHub Actions |
 
 ---
 
@@ -61,13 +87,3 @@
 ├── docker-compose.yml    # 전체 서비스 컨테이너 오케스트레이션
 └── nginx/                # 리버스 프록시 및 SSL 설정
 ```
-
----
-
-## Deployment & CI/CD
-
-- Frontend: Vercel Git Hook 기반 자동 배포
-
-- Backend: GitHub Actions로 Docker Image 빌드 후 EC2 자동 배포
-
-- Security: Certbot(Let's Encrypt) 기반 전 구간 HTTPS 통신 보장 및 CORS 정책 적용
