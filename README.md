@@ -70,4 +70,4 @@
 
 - Backend: GitHub Actions로 Docker Image 빌드 후 EC2 자동 배포
 
-- Security: Certbot(Let's Encrypt) 기반 전 구간 HTTPS 통신 보장 및 CORS 정책 적용
+- Security: Certbot(Let's Encrypt) 기반 HTTPS 통신
