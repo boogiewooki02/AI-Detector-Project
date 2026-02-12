@@ -48,3 +48,4 @@ mysql_data/
 **/models/*.h5
 **/models/*.onnx
 **/models/*.bin
+**/weights/*.pth

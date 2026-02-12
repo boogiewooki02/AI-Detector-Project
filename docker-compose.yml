@@ -31,6 +31,9 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}
       - AWS_REGION=ap-northeast-2
       - S3_BUCKET_NAME=ai-detector-bucket-dongwook
+      - S3_MODEL_KEY=models/sota.pth 
+      - LOCAL_MODEL_PATH=/app/weights/model.pth
+      - MODEL_DOWNLOAD_ALWAYS=false
     networks:
       - ai-network
     depends_on:
