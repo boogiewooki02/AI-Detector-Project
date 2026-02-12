@@ -86,5 +86,4 @@
 ├── backend-spring/       # 비즈니스 로직 및 인증 처리
 ├── ai-server/            # AI 모델 추론 및 시각화 서버
 ├── docker-compose.yml    # 전체 서비스 컨테이너 오케스트레이션
-└── nginx/                # 리버스 프록시 및 SSL 설정
 ```
