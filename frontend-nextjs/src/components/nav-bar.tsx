@@ -76,7 +76,7 @@ export default function NavBar() {
     <header className="sticky top-0 z-50 border-b border-border bg-surface/90 backdrop-blur-md">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4">
         <Link href="/" className="text-lg font-black tracking-tight text-primary">
-          AIDETECTOR
+          Is It AI
         </Link>
         <nav className="hidden items-center gap-7 text-sm md:flex">
           <Link

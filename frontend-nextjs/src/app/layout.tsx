@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Detector",
-  description: "AI 이미지 판별 서비스",
+  title: "Is It AI",
+  description: "Is It AI - AI 이미지 판별 서비스",
 };
 
 export default function RootLayout({
