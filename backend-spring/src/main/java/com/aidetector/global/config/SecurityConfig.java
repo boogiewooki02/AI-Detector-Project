@@ -50,9 +50,13 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
+        configuration.addAllowedOrigin("https://is-it-ai.site");
+        configuration.addAllowedOrigin("https://www.is-it-ai.site");
         configuration.addAllowedOrigin("http://localhost:3000"); // 리액트 주소 허용
+
         configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE 등 모두 허용
         configuration.addAllowedHeader("*"); // 모든 헤더 허용
+
         configuration.setAllowCredentials(true); // 내부에 토큰이나 쿠키를 포함할 수 있게 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

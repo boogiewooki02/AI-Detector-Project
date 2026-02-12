@@ -20,7 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
         // 모든 경로에 대해
         registry.addMapping("/**")
                 // 리액트 서버(3000번 포트)의 접근을 허용
-                .allowedOrigins("http://localhost:3000", "https://ai-detector-project.vercel.app")
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "https://is-it-ai.site",
+                        "https://www.is-it-ai.site",
+                        "https://ai-detector-project.vercel.app"
+                )
                 // 모든 HTTP 메서드(GET, POST, PUT, DELETE 등) 허용
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 // 모든 헤더 허용
