@@ -1,34 +1,73 @@
-# AI 생성 이미지 탐지 프로젝트
+# Is It AI (AI Image Forgery Detection)
 
-1인 토이 프로젝트를 통해 Next.js, Spring, FastAPI로 구성된 개별 시스템 간의 연동과 전반적인 아키텍처 설계를 직접 수행하고자 합니다. 전체적인 시스템 구조를 설계하고 구현하는 경험을 통해, 각 레이어별 역할과 데이터 흐름에 대한 학습을 깊이있게 진행하고자 합니다.
+**Is It AI**는 업로드된 이미지의 위·변조 여부를 정밀 분석하고, 히트맵(Heatmap) 시각화 결과와 함께 신뢰 지표(Confidence 및 다양한 정량 지표)를 제공하는 서비스입니다.
 
-## Project Goals
-- **전체 흐름 직접 구현:** 프론트, 백엔드, AI 서버를 직접 만들며 데이터가 처음부터 끝까지 어떻게 흐르는지 확실히 이해하는 것이 목표입니다.
+---
 
-- **주도적인 설계 경험:** 팀 프로젝트에서 정해진 역할만 수행하는 것에서 벗어나, 기술 선택부터 아키텍처 설계까지 모든 과정을 직접 결정하고 책임져 봅니다.
+## Service Architecture
 
-- **문제 해결 능력:** 서버 간 통신이나 인프라 설정 등 개발 과정에서 마주치는 크고 작은 문제들을 스스로 끝까지 해결해 보며 실무 역량을 기릅니다.
+- **Frontend**: Vercel 기반 정적 호스팅 및 자동 배포
+- **Backend API**: AWS EC2에서 Docker 컨테이너로 운영
+- **Reverse Proxy**: Nginx를 통한 HTTPS(SSL) 및 포트 포워딩 처리
+- **Storage**: AWS S3를 중앙 저장소로 활용하여 서버 간 이미지 데이터 정합성 유지
+
+---
 
 ## Tech Stack
 
-### Backend & AI
-- **Java 17** / **Spring Boot 3.5.9**
-- **Python 3.12** / **FastAPI**
-- **PostgreSQL**
+| 영역   | 사용 기술                                           |
+| ---------- | ---------------------------------------------------- |
+| Frontend   | Next.js 16, React 19, TypeScript, Tailwind CSS 4     |
+| Backend    | Java 21, Spring Boot 3.4, Spring Security (JWT), JPA |
+| AI Server  | Python 3.12, FastAPI, PyTorch, Grad-CAM              |
+| Infra / DB | MySQL, Docker Compose, AWS EC2, AWS S3, GitHub Actions        |
 
-### Frontend
-- **Next.js 14**
-- **Tailwind CSS**
+---
 
-### Infrastructure
-- **Docker**
-- **AWS S3**
+## System Flow
+
+서비스의 효율적인 데이터 처리를 위해 다음 파이프라인으로 구성했습니다.
+
+1. **Upload**  
+   사용자가 업로드한 이미지를 Spring Boot가 수신한 뒤 AWS S3에 저장합니다.
+
+2. **Inference**  
+   Spring 서버가 S3 URL을 FastAPI로 전달하여 **추론 요청**을 수행합니다.
+
+3. **Analysis**  
+   FastAPI 서버에서 **모델 추론 및 히트맵 생성**을 수행하고, 결과 이미지를 S3에 업로드합니다.
+
+4. **Persistence**  
+   Spring 서버가 분석 결과(Confidence, SSIM 등)를 DB에 기록하고 클라이언트에 응답합니다.
+
+---
+
+## Key Features
+
+- **Anonymous Analysis**: 비로그인 사용자도 즉시 이미지 위변조 판별 가능
+- **User History**: JWT 기반 인증으로 사용자별 히스토리 관리 및 상세 조회/삭제
+- **Analysis Metrics**: 단순 판별을 넘어 **Confidence, SSIM, LPIPS, RM, PVR** 등 지표 제공
+- **Visual Feedback**: 원본 대비 **히트맵 이미지 제공**으로 위변조 의심 영역 시각화
+
+---
 
 ## Project Structure
+
 ```text
 .
-├── backend-spring/     # Spring 기반 메인 서버 코드
-├── ai-server-python/   # FastAPI 기반 AI 서버 코드
-├── frontend-nextjs/    # Next.js 기반 프론트엔드 코드
-└── infra/              # Docker 및 DB 설정 파일
+├── frontend-nextjs/      # 사용자 UI 및 API 통신
+├── backend-spring/       # 비즈니스 로직 및 인증 처리
+├── ai-server/            # AI 모델 추론 및 시각화 서버
+├── docker-compose.yml    # 전체 서비스 컨테이너 오케스트레이션
+└── nginx/                # 리버스 프록시 및 SSL 설정
 ```
+
+---
+
+## Deployment & CI/CD
+
+- Frontend: Vercel Git Hook 기반 자동 배포
+
+- Backend: GitHub Actions로 Docker Image 빌드 후 EC2 자동 배포
+
+- Security: Certbot(Let's Encrypt) 기반 전 구간 HTTPS 통신 보장 및 CORS 정책 적용
