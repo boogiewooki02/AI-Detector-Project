@@ -28,7 +28,7 @@ public class S3Service {
         // 파일 이름 설정
         String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
 
-        // 메타 데이터 설정 (파일 크기 등)
+        // 메타 데이터 설정
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentLength(multipartFile.getSize());
         objMeta.setContentType(multipartFile.getContentType());
@@ -45,7 +45,6 @@ public class S3Service {
 
         try {
             // URL에서 파일명(Key) 추출
-            // 예: https://bucket.s3.region.amazonaws.com/filename.png -> filename.png
             String key = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
 
             String decodeKey = URLDecoder.decode(key, StandardCharsets.UTF_8);

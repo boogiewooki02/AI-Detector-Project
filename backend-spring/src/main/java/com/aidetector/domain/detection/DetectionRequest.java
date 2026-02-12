@@ -42,7 +42,7 @@ public class DetectionRequest {
     private Double lpips;              // 지각 유사도
     private Double rm;                 // 잔차 평균
     private Double pvr;                // 강한 피크 비율
-    private String heatmapUrl;    // 저장된 히트맵 파일명 (hm_...)
+    private String heatmapUrl;         // 저장된 히트맵 파일명 (hm_...)
 
     @Builder
     public DetectionRequest(User user, String originalFileName, String storedFilePath) {
@@ -52,9 +52,6 @@ public class DetectionRequest {
         this.status = DetectionStatus.PROCESSING; // 생성 시 초기 상태
     }
 
-    /**
-     * FastAPI 분석 결과를 엔티티에 반영하고 상태를 완료로 변경하는 비즈니스 메서드
-     */
     public void completeAnalysis(Integer label, String labelName, String state,
                                  Double confidence, Double ssim, Double lpips,
                                  Double rm, Double pvr, String heatmapUrl) {
@@ -70,9 +67,6 @@ public class DetectionRequest {
         this.status = DetectionStatus.COMPLETED; // 분석 완료 상태로 변경
     }
 
-    /**
-     * 분석 실패 시 호출할 메서드 (예외 처리용)
-     */
     public void failAnalysis() {
         this.status = DetectionStatus.FAILED;
     }

@@ -8,13 +8,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${AI_SERVER_URL:http://localhost:8000}") // 환경 변수 읽기 (기본값 localhost)
+    @Value("${AI_SERVER_URL:http://localhost:8000}")
     private String aiServerUrl;
 
     @Bean
     public WebClient fastapiClient() {
         return WebClient.builder()
-                .baseUrl(aiServerUrl) // 변수 사용
+                .baseUrl(aiServerUrl)
                 .build();
     }
 }

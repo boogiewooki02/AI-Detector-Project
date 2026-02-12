@@ -30,7 +30,7 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .httpBasic(basic -> basic.disable()) // 기본 로그인 창 비활성화
-                .csrf(csrf -> csrf.disable())       // 세션을 안 쓰므로 CSRF 비활성화
+                .csrf(csrf -> csrf.disable())       // CSRF 비활성화
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안 함
                 .authorizeHttpRequests(auth -> auth

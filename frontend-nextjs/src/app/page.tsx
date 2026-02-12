@@ -416,12 +416,6 @@ export default function Home() {
               </p>
             </article>
           </div>
-
-          {/* <p className="mt-5 rounded-xl border border-[#dbe7d4] bg-[#f4f8f1] px-4 py-3 text-sm text-[#2f4331] shadow-xs">
-            RM/PVR 등 통계적 신호는 단독 판정의 근거가 될 수 없습니다. 반드시
-            모델 확신도 및 시각적 히트맵과 연계하여 종합적인 포렌식 결론을
-            도출하십시오.
-          </p> */}
         </section>
 
         <section

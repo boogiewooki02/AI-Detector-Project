@@ -17,20 +17,19 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // 모든 경로에 대해
         registry.addMapping("/**")
-                // 리액트 서버(3000번 포트)의 접근을 허용
+                // 프론트 서버의 접근을 허용
                 .allowedOrigins(
                         "http://localhost:3000",
                         "https://is-it-ai.site",
                         "https://www.is-it-ai.site",
                         "https://ai-detector-project.vercel.app"
                 )
-                // 모든 HTTP 메서드(GET, POST, PUT, DELETE 등) 허용
+                // 모든 HTTP 메서드 허용
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 // 모든 헤더 허용
                 .allowedHeaders("*")
-                // 쿠키 등 인증 정보 포함 허용 (나중에 로그인 기능 넣을 때 필요)
+                // 쿠키 등 인증 정보 포함 허용
                 .allowCredentials(true);
     }
 }
