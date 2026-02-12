@@ -149,7 +149,7 @@ export default function HistoryPage() {
                         <div
                           className={`rounded-xl border px-3 py-3 transition ${
                             isActive
-                              ? "border-primary/40 bg-cyan-50/50"
+                              ? "border-primary/40 bg-blue-50/40"
                               : "border-border bg-white"
                           }`}
                         >

@@ -210,7 +210,7 @@ export default function Home() {
                         }}
                         className={`relative flex min-h-[320px] items-center justify-center rounded-xl border-2 border-dashed bg-slate-50 p-6 transition ${
                           isDragOver
-                            ? "border-primary bg-cyan-50"
+                            ? "border-primary bg-blue-50/50"
                             : "border-border hover:border-primary/60"
                         } ${analyzing ? "cursor-default" : "cursor-pointer"}`}
                       >
@@ -293,7 +293,7 @@ export default function Home() {
                           <button
                             type="submit"
                             disabled={!canSubmit}
-                            className="w-full cursor-pointer rounded-lg bg-[#3f8fa3] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#66adbe] disabled:cursor-not-allowed disabled:opacity-50"
+                            className="w-full cursor-pointer rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#3f5fb7] disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {analyzing ? "Analyzing..." : "Start Analysis"}
                           </button>

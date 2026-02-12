@@ -62,8 +62,8 @@ export default function NavBar() {
   const navLinkClass = (id: string) =>
     `rounded-md px-3 py-1.5 transition ${
       pathname === "/" && activeSection === id
-        ? "bg-slate-100 text-primary"
-        : "text-foreground hover:bg-slate-100 hover:text-primary"
+        ? "bg-blue-50/80 text-primary"
+        : "text-foreground hover:bg-blue-50/70 hover:text-primary"
     }`;
 
   const handleLogout = () => {
@@ -104,8 +104,8 @@ export default function NavBar() {
             href="/history"
             className={`rounded-md px-3 py-1.5 transition ${
               pathname === "/history"
-                ? "bg-slate-100 text-primary"
-                : "text-foreground hover:bg-slate-100 hover:text-primary"
+                ? "bg-blue-50/80 text-primary"
+                : "text-foreground hover:bg-blue-50/70 hover:text-primary"
             }`}
           >
             History
@@ -120,7 +120,7 @@ export default function NavBar() {
               </Link>
               <Link
                 href="/login"
-                className="rounded-md border border-border bg-white px-3 py-1.5 font-semibold text-foreground shadow-sm transition hover:bg-slate-100"
+                className="rounded-md border border-border bg-white px-3 py-1.5 font-semibold text-foreground shadow-sm transition hover:bg-blue-50/70"
               >
                 Log in
               </Link>
@@ -143,7 +143,7 @@ export default function NavBar() {
           onClick={(event) => handleAnchorClick(event, "analyze")}
           className={`whitespace-nowrap rounded-md px-2 py-1 ${
             pathname === "/" && activeSection === "analyze"
-              ? "bg-slate-100 text-primary"
+              ? "bg-blue-50/80 text-primary"
               : "text-foreground"
           }`}
         >
@@ -154,7 +154,7 @@ export default function NavBar() {
           onClick={(event) => handleAnchorClick(event, "guide")}
           className={`whitespace-nowrap rounded-md px-2 py-1 ${
             pathname === "/" && activeSection === "guide"
-              ? "bg-slate-100 text-primary"
+              ? "bg-blue-50/80 text-primary"
               : "text-foreground"
           }`}
         >
@@ -165,7 +165,7 @@ export default function NavBar() {
           onClick={(event) => handleAnchorClick(event, "faq")}
           className={`whitespace-nowrap rounded-md px-2 py-1 ${
             pathname === "/" && activeSection === "faq"
-              ? "bg-slate-100 text-primary"
+              ? "bg-blue-50/80 text-primary"
               : "text-foreground"
           }`}
         >
@@ -174,7 +174,7 @@ export default function NavBar() {
         <Link
           href="/history"
           className={`whitespace-nowrap rounded-md px-2 py-1 ${
-            pathname === "/history" ? "bg-slate-100 text-primary" : "text-foreground"
+            pathname === "/history" ? "bg-blue-50/80 text-primary" : "text-foreground"
           }`}
         >
           History
