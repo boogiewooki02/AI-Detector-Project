@@ -1,4 +1,5 @@
 # Is It AI (AI Image Forgery Detection)
+> 서비스 확인하기: [is-it-ai.site](https://is-it-ai.site)
 
 **Is It AI**는 업로드된 이미지의 위·변조 여부를 분석하고, 히트맵(Heatmap) 시각화 결과와 함께 신뢰 지표(Confidence 및 다양한 정량 지표)를 제공하는 서비스입니다.
 
@@ -52,15 +53,15 @@
 
 ## Service Screenshots
 
-1. 분석 중 화면
+1. 이미지 분석 중
 
 ![Analyzing Screen](docs/images/analyzing.png)
 
-2. 분석 결과 화면
+2. 분석 결과
 
 ![Analysis Result Screen](docs/images/result.png)
 
-3. 분석 이력 화면
+3. 분석 이력
 
 ![Guideline Screen](docs/images/history.png)
 
