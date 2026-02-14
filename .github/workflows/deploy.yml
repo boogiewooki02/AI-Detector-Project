@@ -54,6 +54,6 @@ jobs:
           key: ${{ secrets.EC2_KEY }}
           script: |
             cd ~
-            docker-compose pull spring
-            docker-compose up -d spring
+            docker compose pull spring
+            docker compose up -d spring
             docker image prune -f
