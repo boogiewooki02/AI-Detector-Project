@@ -14,6 +14,11 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect # MySQL 8~9 버전 호환
 
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
 file:
   upload-dir: ${user.dir}/uploads/
 
