@@ -1,4 +1,5 @@
 # Is It AI (AI Image Forgery Detection)
+
 > 서비스 확인하기: [is-it-ai.site](https://is-it-ai.site)
 
 **Is It AI**는 업로드된 이미지의 위·변조 여부를 분석하고, 히트맵(Heatmap) 시각화 결과와 함께 신뢰 지표(Confidence 및 다양한 정량 지표)를 제공하는 서비스입니다.
@@ -7,16 +8,16 @@
 
 ## Key Features
 
-- **Anonymous Analysis**: 비로그인 사용자도 즉시 이미지 위변조 판별 가능
+- **Analyzing**: 단일 이미지에 대한 분석 지표와 직관적인 히트맵 제공
 - **User History**: JWT 기반 인증으로 사용자별 히스토리 관리 및 상세 조회/삭제
 - **Analysis Metrics**: 단순 판별을 넘어 **Confidence, SSIM, LPIPS, RM, PVR** 등 지표 제공
 - **Visual Feedback**: 원본 대비 **히트맵 이미지 제공**으로 위변조 의심 영역 시각화
 
 ---
 
-## System Flow
+## Main System Flow
 
-서비스의 효율적인 데이터 처리를 위해 다음 파이프라인으로 구성했습니다.
+서비스의 메인 기능인 분석 처리를 위해 다음 파이프라인으로 구성했습니다.
 
 1. **Upload**  
    사용자가 업로드한 이미지를 Spring Boot가 수신한 뒤 AWS S3에 저장합니다.
@@ -34,10 +35,12 @@
 
 ## Service Architecture
 
-- **Frontend**: Vercel 기반 정적 호스팅 및 자동 배포
-- **Backend API**: AWS EC2에서 Docker 컨테이너로 운영
-- **Reverse Proxy**: Nginx를 통한 HTTPS(SSL) 및 포트 포워딩 처리
-- **Storage**: AWS S3를 중앙 스토리지로 활용하여 서버 간 이미지 데이터 정합성 유지
+![Service Architecture](docs/images/service-architecture.png)
+
+- **Frontend**: Vercel에서 Next.js 애플리케이션을 정적 호스팅하며 자동 배포
+- **Backend**: AWS EC2에서 Docker Compose로 Spring Boot와 FastAPI 추론 서버를 함께 운영
+- **Reverse Proxy**: Nginx를 통해 HTTPS(SSL) 적용 후 프록시 라우팅 수행
+- **Storage & DB**: AWS S3에 모델 가중치 및 이미지 파일 저장, MySQL에 사용자/분석 이력 저장
 
 ---
 
@@ -46,8 +49,6 @@
 - Frontend: Vercel Git Hook 기반 자동 배포
 
 - Backend: GitHub Actions로 Docker Image 빌드 후 EC2 자동 배포
-
-- Security: Certbot(Let's Encrypt) 기반 HTTPS 통신
 
 ---
 
@@ -69,12 +70,12 @@
 
 ## Tech Stack
 
-| 영역       | 사용 기술                                              |
-| ---------- | ------------------------------------------------------ |
-| Frontend   | Next.js 16, React 19, TypeScript, Tailwind CSS 4       |
-| Backend    | Java 21, Spring Boot 3.4, Spring Security (JWT), JPA   |
-| AI Server  | Python 3.12, FastAPI, PyTorch, Grad-CAM                |
-| Infra / DB | MySQL, Docker Compose, AWS EC2, AWS S3, GitHub Actions |
+| 영역 | 사용 기술 |
+| --- | --- |
+| Frontend | ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=111827) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white) |
+| Backend | ![Java](https://img.shields.io/badge/Java_21-007396?style=flat-square&logo=openjdk&logoColor=white) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white) ![JPA](https://img.shields.io/badge/JPA-59666C?style=flat-square&logo=hibernate&logoColor=white) |
+| AI Server | ![Python](https://img.shields.io/badge/Python_3.12-3776AB?style=flat-square&logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) ![Grad-CAM](https://img.shields.io/badge/Grad--CAM-111827?style=flat-square&logoColor=white) |
+| Infra / DB | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) ![Docker Compose](https://img.shields.io/badge/Docker_Compose-2496ED?style=flat-square&logo=docker&logoColor=white) ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=flat-square&logo=amazonec2&logoColor=white) ![AWS RDS](https://img.shields.io/badge/AWS_RDS-527FFF?style=flat-square&logo=amazonrds&logoColor=white) ![AWS S3](https://img.shields.io/badge/AWS_S3-569A31?style=flat-square&logo=amazons3&logoColor=white) ![AWS Route 53](https://img.shields.io/badge/AWS_Route_53-8C4FFF?style=flat-square&logo=amazonroute53&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white) |
 
 ---
 
@@ -82,8 +83,9 @@
 
 ```text
 .
+├── .github/              # GitHub Actions 워크플로우
 ├── frontend-nextjs/      # 사용자 UI 및 API 통신
 ├── backend-spring/       # 비즈니스 로직 및 인증 처리
 ├── ai-server/            # AI 모델 추론 및 시각화 서버
-├── docker-compose.yml    # 전체 서비스 컨테이너 오케스트레이션
+└── docker-compose.yml    # 전체 서비스 컨테이너 오케스트레이션
 ```
