@@ -39,8 +39,8 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen">
       <NavBar />
-      <main className="mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-6xl items-center px-5 py-10">
-        <section className="overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
+      <main className="mx-auto flex min-h-[calc(100vh-88px)] w-full max-w-6xl items-center justify-center px-5 py-10">
+        <section className="w-full max-w-5xl overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
           <div className="grid lg:grid-cols-[1.05fr_1fr]">
             <aside className="border-b border-border bg-slate-50 p-8 lg:border-b-0 lg:border-r lg:p-10">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">
