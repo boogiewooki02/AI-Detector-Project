@@ -127,6 +127,18 @@ export default function NavBar() {
           >
             History
           </Link>
+          {loggedIn && (
+            <Link
+              href="/mypage"
+              className={`rounded-md px-3 py-1.5 transition ${
+                pathname === "/mypage"
+                  ? "bg-blue-50/80 text-primary"
+                  : "text-foreground hover:bg-blue-50/70 hover:text-primary"
+              }`}
+            >
+              My Page
+            </Link>
+          )}
           {!loggedIn && (
             <>
               <Link
@@ -196,6 +208,16 @@ export default function NavBar() {
         >
           History
         </Link>
+        {loggedIn && (
+          <Link
+            href="/mypage"
+            className={`whitespace-nowrap rounded-md px-2 py-1 ${
+              pathname === "/mypage" ? "bg-blue-50/80 text-primary" : "text-foreground"
+            }`}
+          >
+            My Page
+          </Link>
+        )}
         {!loggedIn && (
           <>
             <Link href="/signup" className="ml-auto whitespace-nowrap">
