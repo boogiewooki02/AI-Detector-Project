@@ -124,8 +124,8 @@ export default function HistoryPage() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr]">
-              <aside className="rounded-2xl border border-border bg-white p-4">
+            <div className="mt-6 grid gap-6 lg:grid-cols-[360px_1fr] lg:items-start">
+              <aside className="rounded-2xl border border-border bg-white p-4 lg:flex lg:max-h-[calc(100vh-240px)] lg:flex-col">
                 <button
                   type="button"
                   onClick={() => void loadHistory()}
@@ -135,7 +135,7 @@ export default function HistoryPage() {
                   {loadingHistory ? "불러오는 중..." : "새로고침"}
                 </button>
 
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-4 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
                   {history.length === 0 && (
                     <li className="rounded-lg border border-dashed border-border bg-slate-50 p-4 text-sm text-muted">
                       저장된 분석 기록이 없습니다.

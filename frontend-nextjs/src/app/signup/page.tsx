@@ -52,8 +52,8 @@ export default function SignupPage() {
                 분석 히스토리를 시작하세요
               </h1>
               <p className="mt-4 max-w-md text-sm leading-6 text-muted">
-                이메일 기반 계정을 생성하면 분석 결과 이력 관리와 상세 비교 기능을
-                사용할 수 있습니다.
+                이메일 기반 계정을 생성하면 분석 결과 이력 관리와 상세 비교
+                기능을 사용할 수 있습니다.
               </p>
               <ul className="mt-8 space-y-3 text-sm">
                 <li className="rounded-lg border border-border bg-white px-4 py-3">
@@ -121,7 +121,7 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-lg bg-primary px-4 py-2.5 font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
+                  className="cursor-pointer w-full rounded-lg bg-primary px-4 py-2.5 font-semibold text-white transition hover:bg-primary-dark disabled:opacity-60"
                 >
                   {loading ? "회원가입 중..." : "회원가입"}
                 </button>
@@ -129,7 +129,10 @@ export default function SignupPage() {
 
               <div className="mt-5 rounded-lg border border-border bg-slate-50 px-4 py-3 text-sm text-muted">
                 이미 계정이 있나요?{" "}
-                <Link href="/login" className="font-semibold text-primary hover:underline">
+                <Link
+                  href="/login"
+                  className="font-semibold text-primary hover:underline"
+                >
                   로그인
                 </Link>
               </div>
