@@ -18,33 +18,50 @@ export default function NavBar() {
     getAuthSnapshot,
     getAuthServerSnapshot,
   );
-  const [activeSection, setActiveSection] = useState(() => {
-    if (typeof window === "undefined") return "analyze";
-    return window.location.hash.replace("#", "") || "analyze";
-  });
+  const [activeSection, setActiveSection] = useState("analyze");
 
   useEffect(() => {
     if (pathname !== "/") return;
 
     const sectionIds = ["analyze", "guide", "faq"];
+    const initialHash = window.location.hash.replace("#", "");
+    if (sectionIds.includes(initialHash)) {
+      setActiveSection(initialHash);
+    }
     const sectionElements = sectionIds
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
+    if (sectionElements.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target?.id) {
-          setActiveSection(visible.target.id);
+    const updateActiveSectionByScroll = () => {
+      const activationLine = window.scrollY + 140;
+      let currentId = sectionIds[0];
+
+      for (const section of sectionElements) {
+        if (activationLine >= section.offsetTop) {
+          currentId = section.id;
+        } else {
+          break;
         }
-      },
-      { rootMargin: "-25% 0px -55% 0px", threshold: [0.2, 0.5, 0.8] },
-    );
+      }
 
-    sectionElements.forEach((element) => observer.observe(element));
-    return () => observer.disconnect();
+      const nearPageBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+      if (nearPageBottom) {
+        currentId = sectionIds[sectionIds.length - 1];
+      }
+
+      setActiveSection((prev) => (prev === currentId ? prev : currentId));
+    };
+
+    updateActiveSectionByScroll();
+    window.addEventListener("scroll", updateActiveSectionByScroll, { passive: true });
+    window.addEventListener("resize", updateActiveSectionByScroll);
+
+    return () => {
+      window.removeEventListener("scroll", updateActiveSectionByScroll);
+      window.removeEventListener("resize", updateActiveSectionByScroll);
+    };
   }, [pathname]);
 
   const handleAnchorClick = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
