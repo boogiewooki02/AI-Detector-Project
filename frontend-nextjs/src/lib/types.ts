@@ -25,3 +25,22 @@ export interface DetectionResponse {
   originalImageUrl: string;
   heatmapImageUrl: string;
 }
+
+export interface UserMeResponse {
+  email: string;
+  name: string;
+}
+
+export interface UpdateUserRequest {
+  name: string;
+}
+
+export interface UpdateUserResponse {
+  email: string;
+  name: string;
+}
+
+export interface UpdatePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}

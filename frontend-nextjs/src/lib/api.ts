@@ -5,6 +5,10 @@ import type {
   LoginRequest,
   SignupRequest,
   TokenResponse,
+  UpdatePasswordRequest,
+  UpdateUserRequest,
+  UpdateUserResponse,
+  UserMeResponse,
 } from "@/lib/types";
 
 const api = axios.create({
@@ -58,4 +62,22 @@ export async function getDetectionDetail(requestId: number) {
 
 export async function deleteDetectionHistory(requestId: number) {
   await api.delete(`/api/v1/detection/history/${requestId}`);
+}
+
+export async function getMyInfo() {
+  const response = await api.get<UserMeResponse>("/api/v1/user/me");
+  return response.data;
+}
+
+export async function updateMyInfo(data: UpdateUserRequest) {
+  const response = await api.patch<UpdateUserResponse>("/api/v1/user/me", data);
+  return response.data;
+}
+
+export async function updateMyPassword(data: UpdatePasswordRequest) {
+  await api.patch("/api/v1/user/me/password", data);
+}
+
+export async function withdraw() {
+  await api.delete("/api/v1/user/me");
 }

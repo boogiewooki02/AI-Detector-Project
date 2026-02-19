@@ -24,10 +24,6 @@ export default function NavBar() {
     if (pathname !== "/") return;
 
     const sectionIds = ["analyze", "guide", "faq"];
-    const initialHash = window.location.hash.replace("#", "");
-    if (sectionIds.includes(initialHash)) {
-      setActiveSection(initialHash);
-    }
     const sectionElements = sectionIds
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => Boolean(el));
