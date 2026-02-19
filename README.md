@@ -1,4 +1,4 @@
-# Is It AI (AI Image Forgery Detection)
+# Is It AI
 
 > 서비스 확인하기: [is-it-ai.site](https://is-it-ai.site)
 
